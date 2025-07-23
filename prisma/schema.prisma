@@ -1,0 +1,81 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                Int        @id @default(autoincrement())
+  name              String
+  email             String     @unique
+  profilePic        String?
+  skills            String?
+  createdAt         DateTime   @default(now())
+  status            Status[]
+  likes             LikeStatus[]
+  comments          Comment[]
+  sentMessages      Message[]  @relation("SentMessages")
+  receivedMessages  Message[]  @relation("ReceivedMessages")
+  connections1      Connection[] @relation("User1Connections") // Relasi ke Connection (User1)
+  connections2      Connection[] @relation("User2Connections") // Relasi ke Connection (User2)
+}
+
+
+model Status {
+  id        Int       @id @default(autoincrement())
+  content   String
+  createdAt DateTime  @default(now())
+  userId    Int
+  user      User      @relation(fields: [userId], references: [id])
+  likes     LikeStatus[]
+  comments  Comment[]
+}
+
+model LikeStatus {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  statusId  Int
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+  status    Status   @relation(fields: [statusId], references: [id])
+}
+
+model Comment {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  statusId  Int
+  commentText String
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+  status    Status   @relation(fields: [statusId], references: [id])
+}
+
+model Message {
+  id        Int      @id @default(autoincrement())
+  senderId  Int
+  receiverId Int
+  messageText String
+  createdAt DateTime @default(now())
+  sender    User     @relation("SentMessages", fields: [senderId], references: [id])
+  receiver  User     @relation("ReceivedMessages", fields: [receiverId], references: [id])
+}
+
+model Connection {
+  id        Int      @id @default(autoincrement())
+  userId1   Int
+  userId2   Int
+  createdAt DateTime @default(now())
+  user1     User     @relation("User1Connections", fields: [userId1], references: [id])
+  user2     User     @relation("User2Connections", fields: [userId2], references: [id])
+}
+
