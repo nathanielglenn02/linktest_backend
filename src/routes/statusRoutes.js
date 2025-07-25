@@ -8,6 +8,6 @@ const { authMiddleware } = require('../utils/auth');  // Mengimpor authMiddlewar
 router.get('/', getAllStatuses);
 
 // Rute untuk membuat status baru
-router.post('/', createStatus);
+router.post('/', authMiddleware, createStatus);
 
 module.exports = router;

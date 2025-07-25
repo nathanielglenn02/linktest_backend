@@ -1,39 +1,21 @@
-// src/utils/auth.js
 const jwt = require('jsonwebtoken');
 
-// Fungsi untuk membuat token JWT
-const generateToken = (userId) => {
-    return jwt.sign({ userId }, process.env.JWT_SECRET, { expiresIn: '1h' });
-};
-
-// Fungsi untuk memverifikasi token JWT
-const verifyToken = (token) => {
-    try {
-        return jwt.verify(token, process.env.JWT_SECRET);  // Verifikasi token
-    } catch (error) {
-        throw new Error('Invalid or expired token');  // Jika token invalid atau kedaluwarsa
-    }
-};
-
-// Middleware untuk memverifikasi token
 const authMiddleware = (req, res, next) => {
-    const token = req.headers.authorization?.split(' ')[1];  // Ambil token dari header Authorization
+    const authHeader = req.headers.authorization;
 
-    if (!token) {
-        return res.status(403).json({ error: 'Token is required' });
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        return res.status(401).json({ error: 'Token tidak diberikan' });
     }
+
+    const token = authHeader.split(' ')[1];
 
     try {
-        const decoded = verifyToken(token);  // Verifikasi token
-        req.userId = decoded.userId;         // Menyimpan userId ke request untuk digunakan di rute berikutnya
-        next();  // Lanjutkan ke rute berikutnya
-    } catch (error) {
-        return res.status(403).json({ error: 'Invalid or expired token' });  // Jika token invalid
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        req.user = decoded; // Simpan info user ke `req.user`
+        next();
+    } catch (err) {
+        return res.status(401).json({ error: 'Token tidak valid' });
     }
 };
 
-module.exports = {
-    generateToken,
-    verifyToken,
-    authMiddleware,
-};
+module.exports = { authMiddleware };

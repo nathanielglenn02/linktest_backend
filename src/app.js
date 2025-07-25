@@ -9,8 +9,9 @@ const commentRoutes = require('./routes/commentRoutes');  // Mengimpor commentRo
 const messageRoutes = require('./routes/messageRoutes');  // Mengimpor messageRoutes
 const connectionRoutes = require('./routes/connectionRoutes');  // Mengimpor connectionRoutes
 const userRoutes = require('./routes/userRoutes');  // Mengimpor userRoutes jika ada
+const authRoutes = require('./routes/authRoutes');  // Mengimpor authRoutes
 const errorHandler = require('./utils/errorHandler');  // Mengimpor errorHandler
-const authUtils = require('./utils/auth');  // Mengimpor authUtils jika diperlukan
+
 
 const app = express();
 
@@ -25,6 +26,7 @@ app.use('/comment', commentRoutes);  // Menghubungkan comment routes ke '/commen
 app.use('/message', messageRoutes);  // Menghubungkan message routes ke '/message'
 app.use('/connection', connectionRoutes);  // Menghubungkan connection routes ke '/connection'
 app.use('/user', userRoutes);  // Menghubungkan user routes ke '/user'
+app.use('/auth', authRoutes);  // Menghubungkan auth routes ke '/auth'
 
 // Halaman utama (opsional)
 app.get('/', (req, res) => {
